@@ -9,7 +9,7 @@ const Modal = ({ setShowModal }) => {
         <span className="close__modal">
           <i class="ri-close-line" onClick={() => setShowModal(false)}></i>
         </span>
-        <h6 className="text-center text-light">Place a Bid</h6>
+        <h6 className="text-center text-light">Vote</h6>
         <p className="text-center text-light">
           You must bid at least <span className="money">5.89 ETH</span>
         </p>
@@ -38,7 +38,7 @@ const Modal = ({ setShowModal }) => {
           <span className="money">5.89 ETH</span>
         </div>
 
-        <button className="place__bid-btn">Place a Bid</button>
+        <button className="place__bid-btn">Vote</button>
       </div>
     </div>
   );

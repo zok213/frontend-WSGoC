@@ -6,26 +6,26 @@ import "./step-section.css";
 
 const STEP__DATA = [
   {
-    title: "Setup your wallet",
-    desc: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Suscipit eligendi, facilis voluptatum fugit illum ",
+    title: "Submit Your Idea",
+    desc: "Teams create a visual representation of their game-on-chain idea, such as a slide or drawing, and add a title and description. ",
     icon: "ri-wallet-line",
   },
 
   {
-    title: "Create your collection",
-    desc: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Suscipit eligendi, facilis voluptatum fugit illum ",
+    title: "Explore Other Ideas",
+    desc: "Browse through submissions from other teams to discover unique and innovative game-on-chain concepts. ",
     icon: "ri-layout-masonry-line",
   },
 
   {
-    title: "Add your NFTs",
-    desc: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Suscipit eligendi, facilis voluptatum fugit illum ",
+    title: "Cast Your Vote",
+    desc: "After exploring, use your allocated tokens to vote for your favorite ideas. Judges receive 5 tokens each, while participants receive 2 tokens each.",
     icon: "ri-image-line",
   },
 
   {
-    title: "List them for sale",
-    desc: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Suscipit eligendi, facilis voluptatum fugit illum ",
+    title: "Track the Rankings",
+    desc: "Watch ideas climb the leaderboard in real-time based on voting results. See which teams are gaining the most support and feedback.",
     icon: "ri-list-check",
   },
 ];
@@ -47,7 +47,7 @@ const StepSection = () => {
                 </span>
                 <div className="step__item__content">
                   <h5>
-                    <Link to="/wallet">{item.title}</Link>
+                    <Link to="#">{item.title}</Link>
                   </h5>
                   <p className="mb-0">{item.desc}</p>
                 </div>

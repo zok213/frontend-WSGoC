@@ -4,7 +4,6 @@ import { Container, Row, Col } from "reactstrap";
 import CommonSection from "../components/ui/Common-section/CommonSection";
 import NftCard from "../components/ui/Nft-card/NftCard";
 import img from "../assets/images/img-01.jpg";
-import avatar from "../assets/images/ava-01.png";
 
 import "../styles/create-item.css";
 
@@ -13,9 +12,7 @@ const item = {
   title: "Guard",
   desc: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam adipisci cupiditate officia, nostrum et deleniti vero corrupti facilis minima laborum nesciunt nulla error natus saepe illum quasi ratione suscipit tempore dolores. Recusandae, similique modi voluptates dolore repellat eum earum sint.",
   imgUrl: img,
-  creator: "Trista Francis",
-  creatorImg: avatar,
-  currentBid: 7.89,
+  creator: "ITSC",
 };
 
 const Create = () => {
@@ -38,30 +35,10 @@ const Create = () => {
                     <label htmlFor="">Upload File</label>
                     <input type="file" className="upload__input" />
                   </div>
-
+                  
                   <div className="form__input">
-                    <label htmlFor="">Price</label>
-                    <input
-                      type="number"
-                      placeholder="Enter price for one item (ETH)"
-                    />
-                  </div>
-
-                  <div className="form__input">
-                    <label htmlFor="">Minimum Bid</label>
-                    <input type="number" placeholder="Enter minimum bid" />
-                  </div>
-
-                  <div className=" d-flex align-items-center gap-4">
-                    <div className="form__input w-50">
-                      <label htmlFor="">Starting Date</label>
-                      <input type="date" />
-                    </div>
-
-                    <div className="form__input w-50">
-                      <label htmlFor="">Expiration Date</label>
-                      <input type="date" />
-                    </div>
+                    <label htmlFor="">Group</label>
+                    <input type="text" placeholder="Enter group's name" />
                   </div>
 
                   <div className="form__input">
@@ -74,7 +51,7 @@ const Create = () => {
                     <textarea
                       name=""
                       id=""
-                      rows="7"
+                      rows="1"
                       placeholder="Enter description"
                       className="w-100"
                     ></textarea>

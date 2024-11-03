@@ -73,12 +73,10 @@ const Footer = () => {
                 <span>
                   <i class="ri-fire-fill"></i>
                 </span>
-                NFTs
+                IDEATHON
               </h2>
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                Voluptate, quod repellat! Quis quos dolorum tenetur fuga?
-                Aspernatur rerum quae amet.
+              Discover, Support, and Vote for Innovative Game Ideas on the Blockchain.
               </p>
             </div>
           </Col>
@@ -149,11 +147,6 @@ const Footer = () => {
           </Col>
 
           <Col lg="12" className=" mt-4 text-center">
-            <p className="copyright">
-              {" "}
-              Copyrights 2022, Developed by Muhibur Rahman. @Muhib's Tech Diary
-              All Rights Reserved.{" "}
-            </p>
           </Col>
         </Row>
       </Container>
