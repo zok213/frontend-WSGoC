@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./header.css";
 import { Container } from "reactstrap";
-
-import { NavLink, Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import axios from "axios";
 
 const NAV__LINKS = [
   {
@@ -23,6 +23,26 @@ const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
 
+  const [userTokens, setUserTokens] = useState(0); // State to store token count
+
+  // Fetch token data from the backend or API
+  const fetchUserTokens = async () => {
+    try {
+      const response = await axios.get("https://http://127.0.0.1:5000/get-user-tokens", {
+        params: { userId: "current-user-id" }, // Replace with actual user identification logic
+      });
+
+      if (response.status === 200) {
+        setUserTokens(response.data.tokens); // Assume API returns { tokens: number }
+      } else {
+        console.error("Failed to fetch tokens");
+      }
+    } catch (error) {
+      console.error("Error fetching user tokens:", error.message);
+    }
+  };
+
+  // Add/remove shrink class based on scroll position
   const handleScroll = () => {
     if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
       headerRef.current.classList.add("header__shrink");
@@ -31,8 +51,11 @@ const Header = () => {
     }
   };
 
+  // Add event listeners and fetch initial token data
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
+    fetchUserTokens();
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -75,9 +98,10 @@ const Header = () => {
               <span>
                 <i className="ri-wallet-line"></i>
               </span>
-              <Link to="/wallet">Token</Link>
+              <div style={{ marginBottom: "0.2rem" }}>
+                <p style={{ marginBottom: "0" }}>Your Tokens: {userTokens}</p>
+              </div>
             </button>
-
             <span className="mobile__menu">
               <i className="ri-menu-line" onClick={toggleMenu}></i>
             </span>

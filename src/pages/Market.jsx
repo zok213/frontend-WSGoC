@@ -1,47 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import CommonSection from "../components/ui/Common-section/CommonSection";
-
 import NftCard from "../components/ui/Nft-card/NftCard";
 
-import { NFT__DATA } from "../assets/data/data";
-
 import { Container, Row, Col } from "reactstrap";
-
 import "../styles/market.css";
 
 const Market = () => {
-  const [data, setData] = useState(NFT__DATA);
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
-  const handleCategory = () => {};
-
-  const handleItems = () => {};
-
-  // ====== SORTING DATA BY HIGH, MID, LOW RATE =========
-  const handleSort = (e) => {
-    const filterValue = e.target.value;
-
-    if (filterValue === "high") {
-      const filterData = NFT__DATA.filter((item) => item.currentBid >= 6);
-
-      setData(filterData);
+  // Fetch NFT data from the backend
+  const fetchNFTs = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("https://http://127.0.0.1:5000/nfts"); // Replace with your API URL
+      if (response.status === 200) {
+        setData(response.data); // Assume API returns an array of NFT objects
+      } else {
+        throw new Error("Failed to fetch NFTs");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    if (filterValue === "mid") {
-      const filterData = NFT__DATA.filter(
-        (item) => item.currentBid >= 5.5 && item.currentBid < 6
-      );
+  useEffect(() => {
+    fetchNFTs();
+  }, []);
 
-      setData(filterData);
-    }
+  // Handle category selection (can implement filtering later if needed)
+  const handleCategory = (e) => {
+    const category = e.target.value;
+    // Optionally implement category filtering logic
+    console.log("Selected category:", category);
+  };
 
-    if (filterValue === "low") {
-      const filterData = NFT__DATA.filter(
-        (item) => item.currentBid >= 4.89 && item.currentBid < 5.5
-      );
-
-      setData(filterData);
-    }
+  // Handle item selection (can implement filtering later if needed)
+  const handleItems = (e) => {
+    const itemType = e.target.value;
+    // Optionally implement item filtering logic
+    console.log("Selected item type:", itemType);
   };
 
   return (
@@ -73,23 +76,34 @@ const Market = () => {
                     </select>
                   </div>
                 </div>
-
-                <div className="filter__right">
-                  <select onChange={handleSort}>
-                    <option>Sort By</option>
-                    <option value="high">High Rate</option>
-                    <option value="mid">Mid Rate</option>
-                    <option value="low">Low Rate</option>
-                  </select>
-                </div>
               </div>
             </Col>
 
-            {data?.map((item) => (
-              <Col lg="3" md="4" sm="6" className="mb-4" key={item.id}>
-                <NftCard item={item} />
+            {isLoading && (
+              <Col lg="12">
+                <h4>Loading NFTs...</h4>
               </Col>
-            ))}
+            )}
+
+            {error && (
+              <Col lg="12">
+                <h4 className="text-danger">Error: {error}</h4>
+              </Col>
+            )}
+
+            {!isLoading &&
+              !error &&
+              data.map((item) => (
+                <Col lg="3" md="4" sm="6" className="mb-4" key={item.id}>
+                  <NftCard item={item} />
+                </Col>
+              ))}
+
+            {!isLoading && !error && data.length === 0 && (
+              <Col lg="12">
+                <h4>No NFTs available</h4>
+              </Col>
+            )}
           </Row>
         </Container>
       </section>

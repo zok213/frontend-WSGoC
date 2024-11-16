@@ -8,7 +8,7 @@ const STEP__DATA = [
   {
     title: "Submit Your Idea",
     desc: "Teams create a visual representation of their game-on-chain idea, such as a slide or drawing, and add a title and description. ",
-    icon: "ri-wallet-line",
+    icon: "ri-chat-upload-line",
   },
 
   {
@@ -36,7 +36,7 @@ const StepSection = () => {
       <Container>
         <Row>
           <Col lg="12" className="mb-4">
-            <h3 className="step__title">Create and sell your NFTs</h3>
+            <h3 className="step__title">Create and share your ideas</h3>
           </Col>
 
           {STEP__DATA.map((item, index) => (
