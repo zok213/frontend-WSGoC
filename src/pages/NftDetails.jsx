@@ -1,49 +1,73 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Container, Row, Col } from "reactstrap";
+import axios from "axios";
 
 import CommonSection from "../components/ui/Common-section/CommonSection";
-import { useParams } from "react-router-dom";
-import { Container, Row, Col } from "reactstrap";
-import { NFT__DATA } from "../assets/data/data";
-
 import LiveAuction from "../components/ui/Live-auction/LiveAuction";
-
 import "../styles/nft-details.css";
 
-import { Link } from "react-router-dom";
-
 const NftDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Get the NFT ID from the URL
+  const [nft, setNft] = useState(null); // State to store the NFT details
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
-  const singleNft = NFT__DATA.find((item) => item.id === id);
+  useEffect(() => {
+    // Fetch NFT details from the backend
+    const fetchNftDetails = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:5000/get-files`);
+        const fetchedNft = response.data.data.find((item) => item.id === id);
+
+        if (!fetchedNft) {
+          throw new Error("NFT not found");
+        }
+        setNft(fetchedNft);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchNftDetails();
+  }, [id]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
 
   return (
     <>
-      <CommonSection title={singleNft.title} />
+      <CommonSection title={nft.title} />
 
       <section>
         <Container>
           <Row>
             <Col lg="6" md="6" sm="6">
-              <img
-                src={singleNft.imgUrl}
-                alt=""
-                className="w-100 single__nft-img"
-              />
+              <img src={nft.url} alt={nft.title} className="w-100 single__nft-img" />
             </Col>
 
             <Col lg="6" md="6" sm="6">
               <div className="single__nft__content">
-                <h2>{singleNft.title}</h2>
+                <h2>{nft.title}</h2>
 
-                <div className=" d-flex align-items-center justify-content-between mt-4 mb-4">
-
-                  <div className=" d-flex align-items-center gap-2 single__nft-more">
+                <div className="d-flex align-items-center justify-content-between mt-4 mb-4">
+                  <div className="d-flex align-items-center gap-2 single__nft-more">
+                    <p>Group: {nft.group}</p>
                   </div>
                 </div>
-                <p className="my-4">{singleNft.desc}</p>
+                <p className="my-4">Votes: {nft.votes}</p>
                 <button className="singleNft-btn d-flex align-items-center gap-2 w-100">
-                  <i class="ri-shopping-bag-line"></i>
-                  <Link to="#">Vote</Link>
+                  <i className="ri-shopping-bag-line"></i>
+                  <Link to="#" onClick={() => handleVote(nft.id)}>
+                    Vote
+                  </Link>
                 </button>
               </div>
             </Col>
@@ -54,6 +78,15 @@ const NftDetails = () => {
       <LiveAuction />
     </>
   );
+
+  async function handleVote(fileId) {
+    try {
+      await axios.post("http://127.0.0.1:5000/vote", { id: fileId });
+      alert("Vote successfully recorded!");
+    } catch (err) {
+      alert("Failed to record vote. Please try again.");
+    }
+  }
 };
 
 export default NftDetails;
