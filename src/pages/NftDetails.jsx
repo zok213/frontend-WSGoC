@@ -43,7 +43,7 @@ const NftDetails = () => {
                 <p className="my-4">{singleNft.desc}</p>
                 <button className="singleNft-btn d-flex align-items-center gap-2 w-100">
                   <i class="ri-shopping-bag-line"></i>
-                  <Link to="/wallet">Vote</Link>
+                  <Link to="#">Vote</Link>
                 </button>
               </div>
             </Col>

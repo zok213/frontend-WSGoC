@@ -7,65 +7,75 @@ import "./nft-card.css";
 const NftCard = (props) => {
   const { title, id, imgUrl } = props.item;
 
-  const [votes, setVotes] = useState(0); // Store the vote count
-  const [userTokens, setUserTokens] = useState(0); // Store user's token count
-  const [loading, setLoading] = useState(false); // Handle vote button loading state
+  const [votes, setVotes] = useState(0);
+  const [userTokens, setUserTokens] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Backend API URL
-  const API_URL = "https://mantea-mongodbnft.hf.space";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // Fetch initial data: vote count and user token info
   useEffect(() => {
-    // Fetch vote count for the NFT
-    const fetchVotes = async () => {
+    // Fetch initial data: votes and user tokens
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/get-votes?id=${id}`);
-        setVotes(response.data.votes || 0);
+        const voterId = localStorage.getItem("voter_id");
+        if (!voterId) {
+          alert("Please log in to see your token balance.");
+          return;
+        }
+
+        // Fetch vote count and user tokens in parallel
+        const [votesResponse, tokensResponse] = await Promise.all([
+          axios.get(`${API_URL}/get-votes?id=${id}`),
+          axios.get(`${API_URL}/get-voter?id=${voterId}`),
+        ]);
+
+        setVotes(votesResponse.data.votes || 0);
+        setUserTokens(tokensResponse.data.tokens || 0);
       } catch (error) {
-        console.error("Error fetching votes:", error);
+        console.error("Error fetching data:", error);
+        alert("Failed to fetch data. Please try again.");
       }
     };
 
-    // Fetch user tokens
-    const fetchUserTokens = async () => {
-      try {
-        const voterId = localStorage.getItem("voter_id"); // Assume voter ID is stored locally
-        const response = await axios.get(`${API_URL}/get-voter?id=${voterId}`);
-        setUserTokens(response.data.tokens || 0);
-      } catch (error) {
-        console.error("Error fetching user tokens:", error);
-      }
-    };
+    fetchData();
+  }, [id, API_URL]);
 
-    fetchVotes();
-    fetchUserTokens();
-  }, [id]);
-
-  // Handle the vote action
   const handleVote = async () => {
+    const voterId = localStorage.getItem("voter_id");
+    if (!voterId) {
+      alert("Please log in to vote!");
+      return;
+    }
+
     if (userTokens <= 0) {
       alert("You don't have enough tokens to vote!");
       return;
     }
 
+    // Optimistic UI update
+    setVotes((prev) => prev + 1);
+    setUserTokens((prev) => prev - 1);
+
     setLoading(true);
 
     try {
-      const voterId = localStorage.getItem("voter_id");
       const response = await axios.post(`${API_URL}/vote-by-voter`, {
         voter_id: voterId,
         file_id: id,
       });
 
-      if (response.status === 200) {
-        // Update vote count and token count
-        setVotes((prev) => prev + 1);
-        setUserTokens((prev) => prev - 1);
-        alert("Vote submitted successfully!");
-      } else {
-        alert("Failed to submit your vote. Please try again.");
+      if (response.status !== 200) {
+        throw new Error("Failed to submit your vote.");
       }
+
+      // Optional: Verify with backend response if needed
+      console.log("Vote successful:", response.data);
     } catch (error) {
+      // Rollback optimistic UI update on failure
+      setVotes((prev) => prev - 1);
+      setUserTokens((prev) => prev + 1);
+
       console.error("Error voting:", error);
       alert("Error while submitting your vote. Please try again later.");
     } finally {
@@ -76,7 +86,7 @@ const NftCard = (props) => {
   return (
     <div className="single__nft__card">
       <div className="nft__img">
-        <img src={imgUrl} alt="" className="w-100" />
+        <img src={imgUrl} alt={title} className="w-100" />
       </div>
 
       <div className="nft__content">
