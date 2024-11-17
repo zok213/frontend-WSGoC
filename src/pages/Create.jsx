@@ -32,7 +32,7 @@ const Create = () => {
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
-      const firebaseResponse = await axios.post("https://mantea-mongodbnft.hf.space//upload-file", formData, {
+      const firebaseResponse = await axios.post("https://mantea-firebasenft.hf.space/upload/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
