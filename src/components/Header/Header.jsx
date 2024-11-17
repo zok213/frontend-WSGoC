@@ -28,7 +28,7 @@ const Header = () => {
   // Fetch token data from the backend or API
   const fetchUserTokens = async () => {
     try {
-      const response = await axios.get("https://http://127.0.0.1:5000/get-user-tokens", {
+      const response = await axios.get("https://mantea-mongodbnft.hf.space/get-voter/", {
         params: { userId: "current-user-id" }, // Replace with actual user identification logic
       });
 

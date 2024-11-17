@@ -32,14 +32,14 @@ const Create = () => {
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
-      const firebaseResponse = await axios.post("http://http://127.0.0.1:5000/upload-file", formData, {
+      const firebaseResponse = await axios.post("https://mantea-mongodbnft.hf.space//upload-file", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       const firebaseUrl = firebaseResponse.data.url;
 
       // Save the metadata to MongoDB
-      const mongoResponse = await axios.post("http://http://127.0.0.1:5000/upload-files", {
+      const mongoResponse = await axios.post("https://mantea-mongodbnft.hf.space/upload-files", {
         title,
         group,
         url: firebaseUrl,

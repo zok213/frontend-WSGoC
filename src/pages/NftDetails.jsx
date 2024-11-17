@@ -17,7 +17,7 @@ const NftDetails = () => {
     // Fetch NFT details from the backend
     const fetchNftDetails = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:5000/get-files`);
+        const response = await axios.get(`https://mantea-mongodbnft.hf.space/get-files/`);
         const fetchedNft = response.data.data.find((item) => item.id === id);
 
         if (!fetchedNft) {
@@ -81,7 +81,7 @@ const NftDetails = () => {
 
   async function handleVote(fileId) {
     try {
-      await axios.post("http://127.0.0.1:5000/vote", { id: fileId });
+      await axios.post("https://mantea-mongodbnft.hf.space/vote-by-voter/", { id: fileId });
       alert("Vote successfully recorded!");
     } catch (err) {
       alert("Failed to record vote. Please try again.");

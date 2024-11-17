@@ -16,7 +16,7 @@ const Market = () => {
   const fetchNFTs = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://http://127.0.0.1:5000/nfts"); // Replace with your API URL
+      const response = await axios.get("https://mantea-mongodbnft.hf.space/get-files/"); // Replace with your API URL
       if (response.status === 200) {
         setData(response.data); // Assume API returns an array of NFT objects
       } else {

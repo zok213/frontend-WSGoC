@@ -12,7 +12,7 @@ const NftCard = (props) => {
   const [loading, setLoading] = useState(false);
 
   // Backend API URL
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL = process.env.REACT_APP_API_URL || "https://mantea-mongodbnft.hf.space/";
 
   useEffect(() => {
     // Fetch initial data: votes and user tokens
@@ -108,9 +108,6 @@ const NftCard = (props) => {
           </span>
         </div>
 
-        <div className="mt-2">
-          <p className="token__info">Your Tokens: {userTokens}</p>
-        </div>
       </div>
     </div>
   );
