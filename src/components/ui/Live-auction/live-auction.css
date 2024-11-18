@@ -6,6 +6,8 @@
 
 .nft__img img {
   border-radius: 10px;
+  width: 10vw;
+  height: 30vh;
 }
 
 .nft__img {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Container, Row, Col } from "reactstrap";
 import CommonSection from "../components/ui/Common-section/CommonSection";
@@ -7,7 +7,6 @@ import NftCard from "../components/ui/Nft-card/NftCard";
 import "../styles/create-item.css";
 
 const Create = () => {
-  // Inline configuration for API URLs
   const FIREBASE_URL = "https://mantea-firebasenft.hf.space/upload/";
   const MONGODB_URL = "https://mantea-mongodbnft.hf.space/upload-files/";
 
@@ -15,15 +14,26 @@ const Create = () => {
   const [group, setGroup] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
-  const [item, setItem] = useState(null); // State to store the created NFT item
-  const [backendStatus, setBackendStatus] = useState(null); // To store backend status
+  const [item, setItem] = useState(null); // Created NFT item
+  const [backendStatus, setBackendStatus] = useState(null);
 
   // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setUploadedFile(file);
-    setPreviewUrl(URL.createObjectURL(file)); // Set image preview URL
+    if (file) {
+      setUploadedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Set image preview URL
+    }
   };
+
+  // Clean up preview URL to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   // Handle NFT creation
   const handleCreate = async (e) => {
@@ -35,7 +45,7 @@ const Create = () => {
     }
 
     try {
-      // Upload the file to Firebase
+      // Upload file to Firebase
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
@@ -45,7 +55,7 @@ const Create = () => {
 
       const firebaseUrl = firebaseResponse.data.url;
 
-      // Save the metadata to MongoDB
+      // Save metadata to MongoDB
       const mongoResponse = await axios.post(MONGODB_URL, {
         title,
         group,
@@ -56,6 +66,7 @@ const Create = () => {
       alert("NFT created successfully!");
     } catch (error) {
       console.error("Error creating NFT:", error);
+      alert("Failed to create NFT. Please try again.");
     }
   };
 
@@ -78,13 +89,13 @@ const Create = () => {
           <Row>
             <Col lg="3" md="4" sm="6">
               <h5 className="mb-4 text-light">Preview Item</h5>
-              {item || previewUrl ? (
+              {previewUrl || item ? (
                 <NftCard
                   item={{
-                    id: item ? item.id : "preview", // Use a placeholder ID for the preview
+                    id: item ? item.id : "preview", // Placeholder ID for preview
                     title: title || "Preview Title",
-                    imgUrl: previewUrl || "",
-                    votes: item ? item.votes : 0, // Default to 0 votes for the preview
+                    imgUrl: previewUrl || item?.imgUrl || "/placeholder-image.jpg",
+                    votes: item ? item.votes : 0,
                   }}
                 />
               ) : (

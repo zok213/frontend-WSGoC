@@ -99,7 +99,7 @@ const Header = () => {
                 <i className="ri-wallet-line"></i>
               </span>
               <div style={{ marginBottom: "0.2rem" }}>
-                <p style={{ marginBottom: "0" }}>Your Tokens: {userTokens}</p>
+                <p style={{ marginBottom: "0" }}>Tokens: {userTokens}</p>
               </div>
             </button>
             <span className="mobile__menu">
