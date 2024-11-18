@@ -97,7 +97,7 @@ const NftCard = ({ item, handleVote }) => {
             {loading ? "Voting..." : <><i className="ri-star-line"></i> Vote</>}
           </button>
 
-          <span className="history__link">
+          <span className="history__link" style={{ color: "white" }}>
             Votes: {currentVotes}
           </span>
         </div>

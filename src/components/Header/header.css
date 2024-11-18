@@ -73,6 +73,9 @@
   font-size: 1.3rem;
   display: none;
 }
+.gap-5 {
+  gap: 1rem;
+}
 
 @media only screen and (max-width: 768px) {
   .nav__menu {
@@ -113,9 +116,6 @@
     font-size: 0.7rem !important;
   }
 
-  .gap-5 {
-    gap: 1rem !important;
 
-  }
 
 }

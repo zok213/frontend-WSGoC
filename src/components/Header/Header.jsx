@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import "./header.css";
 import { Container } from "reactstrap";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
 
 const NAV__LINKS = [
   {
@@ -13,36 +12,12 @@ const NAV__LINKS = [
     display: "On Top",
     url: "/market",
   },
-  {
-    display: "Create",
-    url: "/create",
-  },
 ];
 
-const Header = () => {
+const Header = ({ numberOfVotes }) => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
 
-  const [userTokens, setUserTokens] = useState(0); // State to store token count
-
-  // Fetch token data from the backend or API
-  const fetchUserTokens = async () => {
-    try {
-      const response = await axios.get("https://mantea-mongodbnft.hf.space/get-voter/", {
-        params: { userId: "current-user-id" }, // Replace with actual user identification logic
-      });
-
-      if (response.status === 200) {
-        setUserTokens(response.data.number_of_votes); // Assume API returns { tokens: number }
-      } else {
-        console.error("Failed to fetch tokens");
-      }
-    } catch (error) {
-      console.error("Error fetching user tokens:", error.message);
-    }
-  };
-
-  // Add/remove shrink class based on scroll position
   const handleScroll = () => {
     if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
       headerRef.current.classList.add("header__shrink");
@@ -51,11 +26,8 @@ const Header = () => {
     }
   };
 
-  // Add event listeners and fetch initial token data
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
-    fetchUserTokens();
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -93,13 +65,13 @@ const Header = () => {
             </ul>
           </div>
 
-          <div className="nav__right d-flex align-items-center gap-5">
+          <div className="nav__right d-flex align-items-center gap-2">
             <button className="btn d-flex gap-2 align-items-center">
               <span>
                 <i className="ri-wallet-line"></i>
               </span>
               <div style={{ marginBottom: "0.2rem" }}>
-                <p style={{ marginBottom: "0" }}>Tokens: {userTokens}</p>
+                <p style={{ marginBottom: "0" }}>Votes: {numberOfVotes ?? 0}</p>
               </div>
             </button>
             <span className="mobile__menu">

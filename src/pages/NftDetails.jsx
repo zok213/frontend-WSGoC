@@ -37,31 +37,37 @@ const NftDetails = () => {
 
   const handleVote = async () => {
     const voterId = localStorage.getItem("voter_id");
-
+  
     if (!voterId) {
       alert("You must log in to vote.");
       setIsModalOpen(false);
       return;
     }
-
+  
     if (voteCount <= 0) {
       alert("Vote count must be greater than 0.");
       return;
     }
-
+  
     try {
-      await axios.post("https://mantea-mongodbnft.hf.space/vote-by-voter/", {
-        id: nft.id,
+      const response = await axios.post("https://mantea-mongodbnft.hf.space/vote-by-voter", {
         voter_id: voterId,
+        file_id: nft.id,
         vote_count: voteCount,
       });
-      alert("Vote successfully recorded!");
-      setNft((prev) => ({ ...prev, votes: prev.votes + voteCount })); // Optimistic UI update
-      setIsModalOpen(false);
+  
+      if (response.status === "None" ) {
+        alert("Vote successfully recorded!");
+        setIsModalOpen(false);
+      } else {
+        throw new Error("Failed to record vote.");
+      }
     } catch (err) {
-      alert("Failed to record vote. Please try again.");
+      console.error("Error recording vote:", err.response?.data || err.message);
     }
   };
+  
+  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -109,7 +115,7 @@ const NftDetails = () => {
       <Modal isOpen={isModalOpen} toggle={() => setIsModalOpen(!isModalOpen)}>
         <ModalHeader toggle={() => setIsModalOpen(!isModalOpen)}>Cast Your Vote</ModalHeader>
         <ModalBody>
-          <p>Enter the number of votes you want to cast:</p>
+          <p style = {{ color: "black"}}> Enter the number of votes:</p>
           <Input
             type="number"
             value={voteCount}
