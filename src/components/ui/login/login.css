@@ -33,4 +33,6 @@
   .modal-content .btn {
     margin-right: 10px;
   }
-  
+  label{
+    color: white;
+  }
