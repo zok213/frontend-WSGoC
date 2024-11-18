@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Container, Row, Col } from "reactstrap";
+import { Container, Row, Col, Modal, ModalHeader, ModalBody, ModalFooter, Button, Input } from "reactstrap";
 import axios from "axios";
 
 import CommonSection from "../components/ui/Common-section/CommonSection";
-import NftCard from "../components/ui/Nft-card/NftCard";
 import LiveAuction from "../components/ui/Live-auction/LiveAuction";
 import "../styles/nft-details.css";
 
@@ -13,6 +12,8 @@ const NftDetails = () => {
   const [nft, setNft] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [voteCount, setVoteCount] = useState(1);
 
   useEffect(() => {
     const fetchNftDetails = async () => {
@@ -34,18 +35,29 @@ const NftDetails = () => {
     fetchNftDetails();
   }, [id]);
 
-  const handleVote = async (fileId) => {
+  const handleVote = async () => {
     const voterId = localStorage.getItem("voter_id");
 
     if (!voterId) {
       alert("You must log in to vote.");
+      setIsModalOpen(false);
+      return;
+    }
+
+    if (voteCount <= 0) {
+      alert("Vote count must be greater than 0.");
       return;
     }
 
     try {
-      await axios.post("https://mantea-mongodbnft.hf.space/vote-by-voter/", { id: fileId });
+      await axios.post("https://mantea-mongodbnft.hf.space/vote-by-voter/", {
+        id: nft.id,
+        voter_id: voterId,
+        vote_count: voteCount,
+      });
       alert("Vote successfully recorded!");
-      setNft((prev) => ({ ...prev, votes: prev.votes + 1 })); // Optimistic UI update
+      setNft((prev) => ({ ...prev, votes: prev.votes + voteCount })); // Optimistic UI update
+      setIsModalOpen(false);
     } catch (err) {
       alert("Failed to record vote. Please try again.");
     }
@@ -81,24 +93,39 @@ const NftDetails = () => {
                 <p className="my-4">Votes: {nft.votes}</p>
                 <button
                   className="singleNft-btn d-flex align-items-center gap-2 w-100"
-                  onClick={() => handleVote(nft.id)}
+                  onClick={() => setIsModalOpen(true)}
                 >
                   <i className="ri-shopping-bag-line"></i> Vote
                 </button>
               </div>
             </Col>
           </Row>
-
-          {/* Pass NFT data and handleVote function to NftCard */}
-          {/* <Row>
-            <Col lg="12">
-              <NftCard item={nft} handleVote={handleVote} />
-            </Col>
-          </Row> */}
         </Container>
       </section>
 
       <LiveAuction />
+
+      {/* Modal for voting */}
+      <Modal isOpen={isModalOpen} toggle={() => setIsModalOpen(!isModalOpen)}>
+        <ModalHeader toggle={() => setIsModalOpen(!isModalOpen)}>Cast Your Vote</ModalHeader>
+        <ModalBody>
+          <p>Enter the number of votes you want to cast:</p>
+          <Input
+            type="number"
+            value={voteCount}
+            onChange={(e) => setVoteCount(Number(e.target.value))}
+            min="1"
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handleVote}>
+            Submit Vote
+          </Button>
+          <Button color="secondary" onClick={() => setIsModalOpen(false)}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </>
   );
 };

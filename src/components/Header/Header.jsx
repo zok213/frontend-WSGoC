@@ -33,7 +33,7 @@ const Header = () => {
       });
 
       if (response.status === 200) {
-        setUserTokens(response.data.tokens); // Assume API returns { tokens: number }
+        setUserTokens(response.data.number_of_votes); // Assume API returns { tokens: number }
       } else {
         console.error("Failed to fetch tokens");
       }
