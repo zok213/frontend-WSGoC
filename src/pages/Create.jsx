@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Container, Row, Col } from "reactstrap";
 import CommonSection from "../components/ui/Common-section/CommonSection";
@@ -8,7 +8,7 @@ import "../styles/create-item.css";
 
 const Create = () => {
   const FIREBASE_URL = "https://mantea-firebasenft.hf.space/upload/";
-  const MONGODB_URL = "https://mantea-mongodbnft.hf.space/upload-files/";
+  const MONGODB_URL = "https://mantea-mongodbnft.hf.space/upload-files";
 
   const [title, setTitle] = useState("");
   const [group, setGroup] = useState("");
@@ -16,6 +16,7 @@ const Create = () => {
   const [previewUrl, setPreviewUrl] = useState("");
   const [item, setItem] = useState(null); // Created NFT item
   const [backendStatus, setBackendStatus] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for actions
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -26,23 +27,15 @@ const Create = () => {
     }
   };
 
-  // Clean up preview URL to avoid memory leaks
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  // Handle NFT creation
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    if (!title || !group || !uploadedFile) {
+    if (!title.trim() || !group.trim() || !uploadedFile) {
       alert("Please fill out all fields and upload a file.");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       // Upload file to Firebase
@@ -53,28 +46,50 @@ const Create = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      if (!firebaseResponse.data.url) {
+        throw new Error("Invalid response from Firebase upload.");
+      }
+
       const firebaseUrl = firebaseResponse.data.url;
 
       // Save metadata to MongoDB
       const mongoResponse = await axios.post(MONGODB_URL, {
-        title,
-        group,
+        title: title.trim(),
+        group: group.trim(),
         url: firebaseUrl,
       });
 
-      setItem({ id: mongoResponse.data.id, title, group, imgUrl: firebaseUrl, votes: 0 });
+      if (!mongoResponse.data.id) {
+        throw new Error("Invalid response from MongoDB.");
+      }
+
+      setItem({
+        id: mongoResponse.data.id,
+        title: title.trim(),
+        group: group.trim(),
+        imgUrl: firebaseUrl,
+        votes: 0,
+      });
+
       alert("NFT created successfully!");
     } catch (error) {
       console.error("Error creating NFT:", error);
-      alert("Failed to create NFT. Please try again.");
+      alert(`Failed to create NFT: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Check backend connection
   const checkBackend = async () => {
     try {
+      setBackendStatus("Checking backend...");
       const response = await axios.get(MONGODB_URL);
-      setBackendStatus(response.status === 200 ? "Backend is connected!" : "Error connecting to backend.");
+      setBackendStatus(
+        response.status === 200
+          ? "Backend is connected!"
+          : "Error connecting to backend."
+      );
     } catch (error) {
       setBackendStatus(`Error: ${error.message}`);
     }
@@ -94,7 +109,7 @@ const Create = () => {
                   item={{
                     id: item ? item.id : "preview", // Placeholder ID for preview
                     title: title || "Preview Title",
-                    imgUrl: previewUrl || item?.imgUrl || "/placeholder-image.jpg",
+                    imgUrl: previewUrl || "",
                     votes: item ? item.votes : 0,
                   }}
                 />
@@ -108,7 +123,11 @@ const Create = () => {
                 <form onSubmit={handleCreate}>
                   <div className="form__input">
                     <label>Upload File</label>
-                    <input type="file" className="upload__input" onChange={handleFileChange} />
+                    <input
+                      type="file"
+                      className="upload__input"
+                      onChange={handleFileChange}
+                    />
                   </div>
 
                   <div className="form__input">
@@ -131,11 +150,18 @@ const Create = () => {
                     />
                   </div>
 
-                  <button type="submit" className="btn btn-primary">
-                    Create Item
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating..." : "Create Item"}
                   </button>
                 </form>
-                <button className="btn btn-secondary mt-3" onClick={checkBackend}>
+                <button
+                  className="btn btn-secondary mt-3"
+                  onClick={checkBackend}
+                >
                   Check Backend Connection
                 </button>
                 {backendStatus && <p className="text-light mt-2">{backendStatus}</p>}
