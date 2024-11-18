@@ -17,7 +17,7 @@ const NftDetails = () => {
     // Fetch NFT details from the backend
     const fetchNftDetails = async () => {
       try {
-        const response = await axios.get(`https://mantea-mongodbnft.hf.space/get-files/`);
+        const response = await axios.get(`https://mantea-mongodbnft.hf.space/get-files`);
         const fetchedNft = response.data.data.find((item) => item.id === id);
 
         if (!fetchedNft) {

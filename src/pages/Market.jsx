@@ -16,14 +16,20 @@ const Market = () => {
   const fetchNFTs = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://mantea-mongodbnft.hf.space/get-files/"); // Replace with your API URL
+      setError(null); // Clear previous errors
+      const response = await axios.get("https://mantea-mongodbnft.hf.space/get-files");
+
+      console.log("API Response:", response); // Log the response for debugging
+
       if (response.status === 200) {
-        setData(response.data); // Assume API returns an array of NFT objects
+        // Assuming the structure of the response is { data: [...] }
+        const fetchedData = Array.isArray(response.data.data) ? response.data.data : [];
+        setData(fetchedData);
       } else {
-        throw new Error("Failed to fetch NFTs");
+        throw new Error(`Failed to fetch NFTs: ${response.statusText}`);
       }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -93,6 +99,7 @@ const Market = () => {
 
             {!isLoading &&
               !error &&
+              data.length > 0 &&
               data.map((item) => (
                 <Col lg="3" md="4" sm="6" className="mb-4" key={item.id}>
                   <NftCard item={item} />

@@ -12,7 +12,7 @@ const LiveAuction = () => {
   const [loading, setLoading] = useState(true); // State to manage loading status
   const [error, setError] = useState(null); // State to manage errors
 
-  const API_URL = "https://mantea-mongodbnft.hf.space/get-files/"; // Backend API endpoint
+  const API_URL = "https://mantea-mongodbnft.hf.space/get-files"; // Backend API endpoint
 
   // Fetch NFT data from the backend
   useEffect(() => {

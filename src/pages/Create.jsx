@@ -7,18 +7,25 @@ import NftCard from "../components/ui/Nft-card/NftCard";
 import "../styles/create-item.css";
 
 const Create = () => {
+  // Inline configuration for API URLs
+  const FIREBASE_URL = "https://mantea-firebasenft.hf.space/upload/";
+  const MONGODB_URL = "https://mantea-mongodbnft.hf.space/upload-files/";
+
   const [title, setTitle] = useState("");
   const [group, setGroup] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [item, setItem] = useState(null); // State to store the created NFT item
+  const [backendStatus, setBackendStatus] = useState(null); // To store backend status
 
+  // Handle file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setUploadedFile(file);
     setPreviewUrl(URL.createObjectURL(file)); // Set image preview URL
   };
 
+  // Handle NFT creation
   const handleCreate = async (e) => {
     e.preventDefault();
 
@@ -32,14 +39,14 @@ const Create = () => {
       const formData = new FormData();
       formData.append("file", uploadedFile);
 
-      const firebaseResponse = await axios.post("https://mantea-firebasenft.hf.space/upload/", formData, {
+      const firebaseResponse = await axios.post(FIREBASE_URL, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       const firebaseUrl = firebaseResponse.data.url;
 
       // Save the metadata to MongoDB
-      const mongoResponse = await axios.post("https://mantea-mongodbnft.hf.space/upload-files", {
+      const mongoResponse = await axios.post(MONGODB_URL, {
         title,
         group,
         url: firebaseUrl,
@@ -49,6 +56,16 @@ const Create = () => {
       alert("NFT created successfully!");
     } catch (error) {
       console.error("Error creating NFT:", error);
+    }
+  };
+
+  // Check backend connection
+  const checkBackend = async () => {
+    try {
+      const response = await axios.get(MONGODB_URL);
+      setBackendStatus(response.status === 200 ? "Backend is connected!" : "Error connecting to backend.");
+    } catch (error) {
+      setBackendStatus(`Error: ${error.message}`);
     }
   };
 
@@ -107,6 +124,10 @@ const Create = () => {
                     Create Item
                   </button>
                 </form>
+                <button className="btn btn-secondary mt-3" onClick={checkBackend}>
+                  Check Backend Connection
+                </button>
+                {backendStatus && <p className="text-light mt-2">{backendStatus}</p>}
               </div>
             </Col>
           </Row>

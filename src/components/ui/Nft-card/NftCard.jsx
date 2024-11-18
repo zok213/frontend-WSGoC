@@ -7,34 +7,34 @@ import "./nft-card.css";
 const NftCard = (props) => {
   const { title, id, imgUrl } = props.item;
 
-  const [votes, setVotes] = useState(0);
-  const [userTokens, setUserTokens] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [votes, setVotes] = useState(0); // Total votes for this NFT
+  const [userTokens, setUserTokens] = useState(0); // Tokens available for the user
+  const [loading, setLoading] = useState(false); // Loading state for vote submission
 
-  // Backend API URL
-  const API_URL = process.env.REACT_APP_API_URL || "https://mantea-mongodbnft.hf.space/";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://mantea-mongodbnft.hf.space";
 
   useEffect(() => {
-    // Fetch initial data: votes and user tokens
     const fetchData = async () => {
-      try {
-        const voterId = localStorage.getItem("voter_id");
-        if (!voterId) {
-          alert("Please log in to see your token balance.");
-          return;
-        }
+      const voterId = localStorage.getItem("voter_id");
 
-        // Fetch vote count and user tokens in parallel
+      if (!voterId) {
+        alert("Please log in to view your token balance and votes.");
+        return;
+      }
+
+      try {
+        // Fetch votes for this NFT and user token balance
         const [votesResponse, tokensResponse] = await Promise.all([
-          axios.get(`${API_URL}/get-votes?id=${id}`),
-          axios.get(`${API_URL}/get-voter?id=${voterId}`),
+          axios.get(`${API_URL}/get-votes`, { params: { id } }),
+          axios.get(`${API_URL}/get-voter`, { params: { id: voterId } }),
         ]);
 
         setVotes(votesResponse.data.votes || 0);
         setUserTokens(tokensResponse.data.tokens || 0);
       } catch (error) {
         console.error("Error fetching data:", error);
-        alert("Failed to fetch data. Please try again.");
+        alert("Failed to fetch NFT or voter data. Please try again later.");
       }
     };
 
@@ -43,21 +43,22 @@ const NftCard = (props) => {
 
   const handleVote = async () => {
     const voterId = localStorage.getItem("voter_id");
+
     if (!voterId) {
-      alert("Please log in to vote!");
+      alert("You must log in to vote.");
       return;
     }
 
     if (userTokens <= 0) {
-      alert("You don't have enough tokens to vote!");
+      alert("You don't have enough tokens to vote.");
       return;
     }
 
-    // Optimistic UI update
-    setVotes((prev) => prev + 1);
-    setUserTokens((prev) => prev - 1);
-
     setLoading(true);
+
+    // Optimistic UI update
+    setVotes((prevVotes) => prevVotes + 1);
+    setUserTokens((prevTokens) => prevTokens - 1);
 
     try {
       const response = await axios.post(`${API_URL}/vote-by-voter`, {
@@ -66,18 +67,17 @@ const NftCard = (props) => {
       });
 
       if (response.status !== 200) {
-        throw new Error("Failed to submit your vote.");
+        throw new Error("Unexpected response from the server.");
       }
 
-      // Optional: Verify with backend response if needed
-      console.log("Vote successful:", response.data);
+      console.log("Vote successfully submitted:", response.data);
     } catch (error) {
-      // Rollback optimistic UI update on failure
-      setVotes((prev) => prev - 1);
-      setUserTokens((prev) => prev + 1);
+      console.error("Error submitting vote:", error);
+      alert("Error while voting. Rolling back changes.");
 
-      console.error("Error voting:", error);
-      alert("Error while submitting your vote. Please try again later.");
+      // Rollback optimistic update
+      setVotes((prevVotes) => prevVotes - 1);
+      setUserTokens((prevTokens) => prevTokens + 1);
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ const NftCard = (props) => {
   return (
     <div className="single__nft__card">
       <div className="nft__img">
-        <img src={imgUrl} alt={title} className="w-100" />
+        <img src={imgUrl || "/placeholder-image.jpg"} alt={title || "NFT"} className="w-100" />
       </div>
 
       <div className="nft__content">
@@ -107,7 +107,6 @@ const NftCard = (props) => {
             <Link to="#">Votes: {votes}</Link>
           </span>
         </div>
-
       </div>
     </div>
   );
