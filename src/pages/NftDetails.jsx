@@ -59,11 +59,18 @@ const NftDetails = () => {
       if (response.status === "None" ) {
         alert("Vote successfully recorded!");
         setIsModalOpen(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } else {
         throw new Error("Failed to record vote.");
       }
     } catch (err) {
       console.error("Error recording vote:", err.response?.data || err.message);
+      setIsModalOpen(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   };
   
