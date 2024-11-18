@@ -106,10 +106,16 @@
   }
 
   .btn {
-    padding: 4px 25px !important;
+    padding: 2px 10px !important;
   }
 
   .btn a {
     font-size: 0.7rem !important;
   }
+
+  .gap-5 {
+    gap: 1rem !important;
+
+  }
+
 }
